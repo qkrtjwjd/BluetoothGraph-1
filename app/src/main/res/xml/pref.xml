@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="100"
+        android:key="max_count_values"
+        android:summary="max number of values on graph"
+        android:title="max number of values"/>
+
+    <EditTextPreference
+        android:defaultValue="40"
+        android:key="max_x_value"
+        android:summary="max value for the X axis"
+        android:title="max X value"/>
+
+</PreferenceScreen>

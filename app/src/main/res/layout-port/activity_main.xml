@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/bg"
+    tools:context="nicktxd.bluetoothgraph.MainActivity"
+    android:orientation="vertical">
+
+    <com.jjoe64.graphview.GraphView
+        android:layout_height="461dp"
+        android:layout_width="match_parent"
+        android:id="@+id/graph"/>
+
+    <LinearLayout
+        android:id="@+id/LL2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ToggleButton
+                android:id="@+id/tbScroll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="false"
+                android:textOff="@string/auto_scroll_x"
+                android:textOn="@string/auto_scroll_x" />
+
+            <ToggleButton
+                android:id="@+id/tbPause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_weight="1"
+                android:checked="false"
+                android:textOff="@string/pause"
+                android:textOn="@string/pause" />
+
+            <Button
+                android:id="@+id/bReset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/reset_graph" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
