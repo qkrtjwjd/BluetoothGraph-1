@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Bluetooth Graph</string>
-    <string name="paired_devices">Paired Devices</string>
+    <string name="Devices">Devices</string>
     <string name="Bluetooth_label">Bluetooth</string>
     <string name="menu_bluetooth">Bluetooth</string>
     <string name="menu_settings">Settings</string>
