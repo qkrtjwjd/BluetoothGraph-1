@@ -36,6 +36,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private ToggleButton tbtScroll;
     private ToggleButton tbtPause;
     private boolean connected = false;
+    private boolean debug = false;
     private boolean autoScroll = true;
     private boolean pause = false;
 
@@ -45,6 +46,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         private boolean autoScroll;
         private boolean pause;
         private boolean connected;
+        private boolean debug;
     }
     private objToSave saveState;
     private objToSave retState;
@@ -57,6 +59,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         saveState.autoScroll = autoScroll;
         saveState.pause = pause;
         saveState.connected = connected;
+        saveState.debug = debug;
 
         return saveState;
     }
@@ -133,8 +136,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             pause = retState.pause;
             tbtPause.setChecked(pause);
             connected = retState.connected;
+            debug = retState.debug;
             if(connected) {
                 setTitle(BluetoothActivity.getSelDevice().getName());
+            }
+            if (debug){
+                setTitle("Debug");
             }
         }
     }
@@ -219,6 +226,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     Toast.makeText(getApplicationContext(), "Connection already established", Toast.LENGTH_SHORT).show();
                     break;
                 }
+                if(debug){
+                    Toast.makeText(getApplicationContext(), "Debug already started", Toast.LENGTH_SHORT).show();
+                    break;
+                }
                 //BluetoothActivity.debugThread = new BluetoothActivity.DEBUGThread();
                 //BluetoothActivity.debugThread.start();
                 startActivity(new Intent("android.intent.action.BT"));
@@ -230,8 +241,28 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if(connected){
                     BluetoothActivity.disconnect();
                     connected = false;
-                    setTitle(BluetoothActivity.getSelDevice().getName());
+                    setTitle(getString(R.string.app_name));
                 }
+                if(debug){
+                    BluetoothActivity.stopDebug();
+                    debug = false;
+                    setTitle(getString(R.string.app_name));
+
+                }
+                break;
+            case R.id.Debug:
+                if(connected) {
+                    Toast.makeText(getApplicationContext(), "Connection already established", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                if(debug){
+                    Toast.makeText(getApplicationContext(), "Debug already started", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                BluetoothActivity.debugThread = new BluetoothActivity.DEBUGThread();
+                BluetoothActivity.debugThread.start();
+                //setTitle(getString(R.string.debug));
+                debug = true;
                 break;
         }
         return super.onOptionsItemSelected(item);

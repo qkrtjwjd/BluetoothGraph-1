@@ -33,7 +33,12 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             connectedThread = null;
         }
     }
-
+    public static void stopDebug(){
+        if(debugThread != null)
+            cancelDebug = true;
+            debugThread = null;
+    }
+    private static boolean cancelDebug;
     public static void gethandler(Handler handler){//Bluetooth handler
         mHandler = handler;
     }
@@ -314,10 +319,13 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
 
     static class DEBUGThread extends Thread {
         public void run() {
+            cancelDebug = false;
             while (true) {
                 try {
+                    if(cancelDebug)
+                        break;
                     try {
-                        sleep(300);
+                        sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
