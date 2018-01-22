@@ -15,7 +15,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.jjoe64.graphview.GraphView;
@@ -26,9 +29,20 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
+import java.util.List;
+
 public class MainActivity extends Activity implements View.OnClickListener {
 
     //SharedPreferences pref;
+
+    private int zero = 2048;
+    private int sensetivity = 200;
+    private double acceleration = 9.8;
+
+    private int lastType = 0;
+    private int curType = 0;
+    private int typeOfData = 0;
+
     private double graphLastXValue = 0;
     private int maxCountValues = 500;
     private int maxXvalue = 50;
@@ -39,6 +53,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private boolean debug = false;
     private boolean autoScroll = true;
     private boolean pause = false;
+    private GraphView graph;
+    private Viewport viewport;
 
     private class objToSave{
         private LineGraphSeries<DataPoint> series;
@@ -47,6 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         private boolean pause;
         private boolean connected;
         private boolean debug;
+        private int typeOfData;
     }
     private objToSave saveState;
     private objToSave retState;
@@ -81,8 +98,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     void graphInit() {
-        GraphView graph = (GraphView) findViewById(R.id.graph);
-        Viewport viewport = graph.getViewport();
+        graph = (GraphView) findViewById(R.id.graph);
+        viewport = graph.getViewport();
         viewport.setScalable(true);
         viewport.setScalableY(true);
         viewport.setScrollable(true);
@@ -122,6 +139,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     void Init() {
+        Spinner typeOfDataList = (Spinner) findViewById(R.id.spinner);
+        String[] typeOfDataStrings = {"raw", "g", "m/s"};
+        ArrayAdapter<String> typeOfDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, typeOfDataStrings);
+        typeOfDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        typeOfDataList.setAdapter(typeOfDataAdapter);
+        typeOfDataList.setOnItemSelectedListener(itemSelectedListener);
         Button btReset = (Button) findViewById(R.id.bReset);
         btReset.setOnClickListener(this);
         tbtScroll = (ToggleButton) findViewById(R.id.tbScroll);
@@ -131,6 +154,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         tbtPause.setChecked(false);
         tbtPause.setOnClickListener(this);
         if(retState != null){
+            typeOfData = retState.typeOfData;
             autoScroll = retState.autoScroll;
             tbtScroll.setChecked(autoScroll);
             pause = retState.pause;
@@ -146,6 +170,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    void resetGraph(){
+        series.resetData(new DataPoint[]{new DataPoint(0,0)});
+        graphLastXValue = 0;
+        series.appendData(new DataPoint(0, 0), autoScroll, maxCountValues);
+    }
+
+    double rawToG(double rawData){
+        return (rawData - zero)/sensetivity;
+    }
+
+    double rawToAc(double rawData){
+        return (rawData - zero)*acceleration/sensetivity;
+    }
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -156,12 +193,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 pause = tbtPause.isChecked();
                 break;
             case R.id.bReset:
-                series.resetData(new DataPoint[]{new DataPoint(0,0)});
-                graphLastXValue = 0;
+                    resetGraph();
                 break;
         }
 
     }
+
+    AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            typeOfData = i;
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
+        }
+    };
 
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
@@ -191,8 +239,29 @@ public class MainActivity extends Activity implements View.OnClickListener {
                             flag = false;
                         }
                         if (isFloatNumber(strIncom) && flag && !pause) {
+                            double rawData = Double.parseDouble(strIncom);
+                            double procData = 0;
+                            switch (typeOfData){
+                                case 0:
+                                    procData = rawData;
+                                    curType = 0;
+                                    break;
+                                case 1:
+                                    procData = rawToAc(rawData);
+                                    curType = 1;
+                                    break;
+                                case 2:
+                                    procData = rawToG(rawData);
+                                    curType = 2;
+                                    break;
+                            }
+                            if (curType != lastType){
+                                resetGraph();
+                                lastType = curType;
+                            }
+
                             try {
-                                series.appendData(new DataPoint(graphLastXValue, Double.parseDouble(strIncom)), autoScroll, maxCountValues);
+                                series.appendData(new DataPoint(graphLastXValue, procData), autoScroll, maxCountValues);
                             }catch (Exception ignored){}
 
                             graphLastXValue+=1;
@@ -230,8 +299,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     Toast.makeText(getApplicationContext(), "Debug already started", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                //BluetoothActivity.debugThread = new BluetoothActivity.DEBUGThread();
-                //BluetoothActivity.debugThread.start();
                 startActivity(new Intent("android.intent.action.BT"));
                 break;
             case R.id.settings:
@@ -261,7 +328,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
                 BluetoothActivity.debugThread = new BluetoothActivity.DEBUGThread();
                 BluetoothActivity.debugThread.start();
-                //setTitle(getString(R.string.debug));
+                setTitle(getString(R.string.debug));
                 debug = true;
                 break;
         }

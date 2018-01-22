@@ -9,9 +9,9 @@
     android:orientation="vertical">
 
     <com.jjoe64.graphview.GraphView
-        android:layout_height="461dp"
+        android:id="@+id/graph"
         android:layout_width="match_parent"
-        android:id="@+id/graph"/>
+        android:layout_height="414dp" />
 
     <LinearLayout
         android:id="@+id/LL2"
@@ -24,31 +24,44 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ToggleButton
-                android:id="@+id/tbScroll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/bReset"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
-                android:textOff="@string/auto_scroll_x"
-                android:textOn="@string/auto_scroll_x" />
+                android:text="@string/reset_graph" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <ToggleButton
                 android:id="@+id/tbPause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_alignParentLeft="true"
                 android:layout_weight="1"
                 android:checked="false"
                 android:textOff="@string/pause"
                 android:textOn="@string/pause" />
 
-            <Button
-                android:id="@+id/bReset"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ToggleButton
+                android:id="@+id/tbScroll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/reset_graph" />
+                android:checked="false"
+                android:textOff="@string/auto_scroll_x"
+                android:textOn="@string/auto_scroll_x" />
 
         </LinearLayout>
 

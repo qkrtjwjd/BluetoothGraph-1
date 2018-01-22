@@ -329,7 +329,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    int temp = (int)((Math.random()*50+1));
+                    int temp = (int)((Math.random()*2048-1024));
                     mHandler.obtainMessage(MESSAGE_READ, "s"+temp+"\n").sendToTarget();
 
                 } catch (Exception e) {
