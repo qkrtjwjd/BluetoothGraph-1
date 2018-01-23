@@ -247,11 +247,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                                     curType = 0;
                                     break;
                                 case 1:
-                                    procData = rawToAc(rawData);
+                                    procData = rawToG(rawData);
                                     curType = 1;
                                     break;
                                 case 2:
-                                    procData = rawToG(rawData);
+                                    procData = rawToAc(rawData);
                                     curType = 2;
                                     break;
                             }
