@@ -209,7 +209,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             btAdapter.cancelDiscovery();
         }
         if (listAdapter.getItem(arg2).contains("(Paired)")){
-            Toast.makeText(getApplicationContext(), "Connecting to "+listAdapter.getItem(arg2), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Connecting to "+listAdapter.getItem(arg2), Toast.LENGTH_SHORT).show();
             BluetoothDevice selectedDevice = devices.get(arg2);
             ConnectThread connect = new ConnectThread(selectedDevice);
             connect.start();

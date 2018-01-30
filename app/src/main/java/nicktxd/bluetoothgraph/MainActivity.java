@@ -220,7 +220,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 case BluetoothActivity.SUCCESS_CONNECT:
                     BluetoothActivity.connectedThread = new BluetoothActivity.ConnectedThread((BluetoothSocket) msg.obj);
-                    Toast.makeText(getApplicationContext(), "Connected!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Connected!", Toast.LENGTH_SHORT).show();
                     BluetoothActivity.connectedThread.start();
                     connected = true;
                     setTitle(BluetoothActivity.getSelDevice().getName());
