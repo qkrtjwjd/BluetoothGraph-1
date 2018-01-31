@@ -12,4 +12,7 @@
     <string name="pause">Pause</string>
     <string name="reset_graph">Reset graph</string>
     <string name="debug">Debug</string>
+    <string name="max_x_value">max_x_value</string>
+    <string name="max_count_values">max_count_values</string>
+    <string name="Settings_label">Settings</string>
 </resources>

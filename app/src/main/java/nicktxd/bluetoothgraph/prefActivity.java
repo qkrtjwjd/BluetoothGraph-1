@@ -26,6 +26,7 @@ public class prefActivity extends PreferenceActivity {
         {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref);
+
         }
     }
 }

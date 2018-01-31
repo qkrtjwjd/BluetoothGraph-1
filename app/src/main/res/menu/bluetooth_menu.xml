@@ -9,9 +9,7 @@
 
     <item android:id="@+id/settings"
         android:title="@string/menu_settings"
-        android:icon="@mipmap/settings2"
-        android:visible="false"
-        android:showAsAction="ifRoom"/>
+        android:icon="@mipmap/settings2"/>
 
     <item android:id="@+id/Disconnect"
         android:title="@string/disconnect"/>

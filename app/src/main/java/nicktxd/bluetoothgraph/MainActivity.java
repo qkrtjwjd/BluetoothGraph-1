@@ -5,12 +5,14 @@ import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,23 +31,20 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
-import java.util.List;
+public class MainActivity extends Activity {
 
-public class MainActivity extends Activity implements View.OnClickListener {
-
-    //SharedPreferences pref;
-
-    private int zero = 2048;
-    private int sensetivity = 200;
-    private double acceleration = 9.8;
+    private int zero;
+    private int sensetivity;
+    private double acceleration;
 
     private int lastType = 0;
     private int curType = 0;
     private int typeOfData = 0;
 
+    private SharedPreferences sharedPref;
+
     private double graphLastXValue = 0;
-    private int maxCountValues = 500;
-    private int maxXvalue = 50;
+    private int maxCountValues;
     private LineGraphSeries<DataPoint> series;
     private ToggleButton tbtScroll;
     private ToggleButton tbtPause;
@@ -53,8 +52,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private boolean debug = false;
     private boolean autoScroll = true;
     private boolean pause = false;
-    private GraphView graph;
-    private Viewport viewport;
 
     private class objToSave{
         private LineGraphSeries<DataPoint> series;
@@ -77,6 +74,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         saveState.pause = pause;
         saveState.connected = connected;
         saveState.debug = debug;
+        saveState.typeOfData = typeOfData;
 
         return saveState;
     }
@@ -84,22 +82,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
-        // this.getWindow().setFlags(WindowManager.LayoutParams.
-        //         FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
-        // pref = PreferenceManager.getDefaultSharedPreferences(this);
         BluetoothActivity.gethandler(mHandler);
         saveState = new objToSave();
         retState = (objToSave) getLastNonConfigurationInstance();
         graphInit();
         Init();
+
     }
 
     void graphInit() {
-        graph = (GraphView) findViewById(R.id.graph);
-        viewport = graph.getViewport();
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        Viewport viewport = graph.getViewport();
         viewport.setScalable(true);
         viewport.setScalableY(true);
         viewport.setScrollable(true);
@@ -108,7 +103,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         viewport.setBorderColor(Color.BLUE);
         viewport.setDrawBorder(true);
         viewport.setMinX(0);
-        viewport.setMaxX(maxXvalue);
         viewport.setXAxisBoundsManual(true);
 
         Paint paint = new Paint();
@@ -145,14 +139,26 @@ public class MainActivity extends Activity implements View.OnClickListener {
         typeOfDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeOfDataList.setAdapter(typeOfDataAdapter);
         typeOfDataList.setOnItemSelectedListener(itemSelectedListener);
+
         Button btReset = (Button) findViewById(R.id.bReset);
-        btReset.setOnClickListener(this);
+        btReset.setOnClickListener(onClickListener);
         tbtScroll = (ToggleButton) findViewById(R.id.tbScroll);
         tbtScroll.setChecked(true);
-        tbtScroll.setOnClickListener(this);
+        tbtScroll.setOnClickListener(onClickListener);
         tbtPause = (ToggleButton) findViewById(R.id.tbPause);
         tbtPause.setChecked(false);
-        tbtPause.setOnClickListener(this);
+        tbtPause.setOnClickListener(onClickListener);
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        try {
+            maxCountValues = Integer.parseInt(sharedPref.getString("max_count_values", ""));
+            zero = Integer.parseInt(sharedPref.getString("zero", ""));
+            sensetivity = Integer.parseInt(sharedPref.getString("sensetivity", ""));
+            acceleration = Double.parseDouble(sharedPref.getString("acceleration", ""));
+        }catch (Exception ignored){}
+
+        sharedPref.registerOnSharedPreferenceChangeListener(settingsChangedListener);
+
         if(retState != null){
             typeOfData = retState.typeOfData;
             autoScroll = retState.autoScroll;
@@ -183,21 +189,35 @@ public class MainActivity extends Activity implements View.OnClickListener {
     double rawToAc(double rawData){
         return (rawData - zero)*acceleration/sensetivity;
     }
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.tbScroll:
-                autoScroll = tbtScroll.isChecked();
-                break;
-            case R.id.tbPause:
-                pause = tbtPause.isChecked();
-                break;
-            case R.id.bReset:
-                    resetGraph();
-                break;
-        }
 
-    }
+    OnSharedPreferenceChangeListener settingsChangedListener = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+            try {
+                maxCountValues = Integer.parseInt(sharedPref.getString("max_count_values", ""));
+                zero = Integer.parseInt(sharedPref.getString("zero", ""));
+                sensetivity = Integer.parseInt(sharedPref.getString("sensetivity", ""));
+                acceleration = Double.parseDouble(sharedPref.getString("acceleration", ""));
+            }catch (Exception ignored){}
+        }
+    };
+
+    View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()){
+                case R.id.tbScroll:
+                    autoScroll = tbtScroll.isChecked();
+                    break;
+                case R.id.tbPause:
+                    pause = tbtPause.isChecked();
+                    break;
+                case R.id.bReset:
+                    resetGraph();
+                    break;
+            }
+        }
+    };
 
     AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
         @Override
@@ -220,7 +240,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 case BluetoothActivity.SUCCESS_CONNECT:
                     BluetoothActivity.connectedThread = new BluetoothActivity.ConnectedThread((BluetoothSocket) msg.obj);
-                    //Toast.makeText(getApplicationContext(), "Connected!", Toast.LENGTH_SHORT).show();
                     BluetoothActivity.connectedThread.start();
                     connected = true;
                     setTitle(BluetoothActivity.getSelDevice().getName());

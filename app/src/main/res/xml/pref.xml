@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="Graph">
+
+    </PreferenceCategory>
     <EditTextPreference
-        android:defaultValue="100"
-        android:key="max_count_values"
-        android:summary="max number of values on graph"
-        android:title="max number of values"/>
+        android:defaultValue="500"
+        android:key="@string/max_count_values"
+        android:title="Max number of values on graph"/>
+    <PreferenceCategory android:title="Data">
 
+    </PreferenceCategory>
     <EditTextPreference
-        android:defaultValue="40"
-        android:key="max_x_value"
-        android:summary="max value for the X axis"
-        android:title="max X value"/>
-
+        android:defaultValue="2048"
+        android:key="zero"
+        android:title="Zero" />
+    <EditTextPreference
+        android:defaultValue="200"
+        android:key="sensetivity"
+        android:title="Sensetivity" />
+    <EditTextPreference
+        android:defaultValue="9.8"
+        android:key="acceleration"
+        android:title="Acceleration" />
 </PreferenceScreen>
