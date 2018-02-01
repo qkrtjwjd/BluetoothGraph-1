@@ -134,7 +134,7 @@ public class MainActivity extends Activity {
 
     void Init() {
         Spinner typeOfDataList = (Spinner) findViewById(R.id.spinner);
-        String[] typeOfDataStrings = {"raw", "g", "m/s"};
+        String[] typeOfDataStrings = {"RAW", "G", "M/S"};
         ArrayAdapter<String> typeOfDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, typeOfDataStrings);
         typeOfDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeOfDataList.setAdapter(typeOfDataAdapter);
