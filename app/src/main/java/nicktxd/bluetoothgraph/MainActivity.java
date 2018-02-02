@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
@@ -109,6 +110,12 @@ public class MainActivity extends Activity {
         paint.setStyle(Paint.Style.FILL);
         paint.setStrokeWidth(5);
         paint.setPathEffect(new DashPathEffect(new float[]{8, 5}, 0));
+
+        graph.getGridLabelRenderer().setVerticalAxisTitle("Data");
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Number of data point");
+        graph.getGridLabelRenderer().setLabelVerticalWidth(80);
+        graph.getGridLabelRenderer().setTextSize(30);
+
 
         if (retState == null) {
             series = new LineGraphSeries<>();
