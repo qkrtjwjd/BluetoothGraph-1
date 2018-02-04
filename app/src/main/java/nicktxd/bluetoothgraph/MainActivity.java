@@ -94,17 +94,24 @@ public class MainActivity extends Activity {
     }
 
     void graphInit() {
+
         GraphView graph = (GraphView) findViewById(R.id.graph);
-        Viewport viewport = graph.getViewport();
-        viewport.setScalable(true);
-        viewport.setScalableY(true);
-        viewport.setScrollable(true);
-        viewport.setScrollableY(true);
-        viewport.setBackgroundColor(Color.WHITE);
-        viewport.setBorderColor(Color.BLUE);
-        viewport.setDrawBorder(true);
-        viewport.setMinX(0);
-        viewport.setXAxisBoundsManual(true);
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setYAxisBoundsManual(true);
+
+        graph.getViewport().setScalable(true);
+        graph.getViewport().setScalableY(true);
+        graph.getViewport().setScrollable(true);
+        graph.getViewport().setScrollableY(true);
+
+        graph.getViewport().setBackgroundColor(Color.WHITE);
+
+        graph.getViewport().setMinY(-1000);
+        graph.getViewport().setMaxY(1000);
+        graph.getViewport().setMaxX(50);
+
+
 
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
@@ -113,6 +120,8 @@ public class MainActivity extends Activity {
 
         graph.getGridLabelRenderer().setVerticalAxisTitle("Data");
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Number of data point");
+        graph.getGridLabelRenderer().setVerticalAxisTitleTextSize(35);
+        graph.getGridLabelRenderer().setHorizontalAxisTitleTextSize(35);
         graph.getGridLabelRenderer().setLabelVerticalWidth(80);
         graph.getGridLabelRenderer().setTextSize(30);
 
@@ -129,7 +138,7 @@ public class MainActivity extends Activity {
             series = retState.series;
             graphLastXValue = retState.graphLastXValue;
         }
-        //series.setAnimated(true);
+
         graph.addSeries(series);
         series.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
@@ -141,7 +150,7 @@ public class MainActivity extends Activity {
 
     void Init() {
         Spinner typeOfDataList = (Spinner) findViewById(R.id.spinner);
-        String[] typeOfDataStrings = {"RAW", "G", "M/S"};
+        String[] typeOfDataStrings = {"RAW", "G", "M/S²"};
         ArrayAdapter<String> typeOfDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, typeOfDataStrings);
         typeOfDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeOfDataList.setAdapter(typeOfDataAdapter);

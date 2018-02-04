@@ -176,6 +176,11 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                     if (btAdapter.getState() == BluetoothAdapter.STATE_OFF){
                         turnOnBT();
                     }
+                }else if(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(action)){
+                    if (intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1) == BluetoothAdapter.STATE_DISCONNECTED){
+                        Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
+                        connectedThread.cancel();
+                    }
                 }
             }
 
@@ -183,6 +188,8 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(receiver, filter);
         filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(receiver, filter);
+        filter = new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
         registerReceiver(receiver, filter);
     }
 
@@ -209,7 +216,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             btAdapter.cancelDiscovery();
         }
         if (listAdapter.getItem(arg2).contains("(Paired)")){
-            //Toast.makeText(getApplicationContext(), "Connecting to "+listAdapter.getItem(arg2), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Connecting to "+listAdapter.getItem(arg2), Toast.LENGTH_SHORT).show();
             BluetoothDevice selectedDevice = devices.get(arg2);
             ConnectThread connect = new ConnectThread(selectedDevice);
             connect.start();
@@ -246,11 +253,12 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             } catch (IOException connectException) {
                 try {
                     mmSocket.close();
-                } catch (IOException closeException) { }
+                } catch (IOException ignored) { }
                 return;
             }
 
             mHandler.obtainMessage(SUCCESS_CONNECT, mmSocket).sendToTarget();
+            finish();
         }
 
         public void cancel() {
@@ -329,7 +337,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                     int temp = (int)((Math.random()*2048-1024));
+                     int temp = (int)((Math.random()*4296-2048));
                     mHandler.obtainMessage(MESSAGE_READ, "s"+temp+"\n").sendToTarget();
 
                 } catch (Exception e) {
