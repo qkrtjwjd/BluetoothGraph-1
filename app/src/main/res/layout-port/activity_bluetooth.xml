@@ -5,12 +5,11 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/tvPd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:text="@string/Devices"
-        android:textColor="@android:color/black"
+        android:textColor="@color/textColorPrimary"
         android:textSize="18sp" />
 
     <android.support.v4.widget.SwipeRefreshLayout

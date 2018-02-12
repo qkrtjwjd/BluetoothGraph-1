@@ -105,11 +105,10 @@ public class MainActivity extends Activity {
         graph.getViewport().setScrollable(true);
         graph.getViewport().setScrollableY(true);
 
-        graph.getViewport().setBackgroundColor(Color.WHITE);
-
         graph.getViewport().setMinY(-1000);
         graph.getViewport().setMaxY(1000);
         graph.getViewport().setMaxX(50);
+
 
 
 
@@ -118,8 +117,8 @@ public class MainActivity extends Activity {
         paint.setStrokeWidth(5);
         paint.setPathEffect(new DashPathEffect(new float[]{8, 5}, 0));
 
-        graph.getGridLabelRenderer().setVerticalAxisTitle("Data");
-        graph.getGridLabelRenderer().setHorizontalAxisTitle("Number of data point");
+        //graph.getGridLabelRenderer().setVerticalAxisTitle("Data");
+        //graph.getGridLabelRenderer().setHorizontalAxisTitle("Number of data point");
         graph.getGridLabelRenderer().setVerticalAxisTitleTextSize(35);
         graph.getGridLabelRenderer().setHorizontalAxisTitleTextSize(35);
         graph.getGridLabelRenderer().setLabelVerticalWidth(80);
