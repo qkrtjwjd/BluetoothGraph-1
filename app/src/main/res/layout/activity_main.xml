@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/bg"
+    tools:context="nicktxd.bluetoothgraph.MainActivity"
     android:orientation="horizontal"
-    android:weightSum="100"
-    tools:context="nicktxd.bluetoothgraph.MainActivity">
+    android:weightSum="100">
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="100" />
 
     <LinearLayout
+        android:id="@+id/LL2"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -21,7 +24,7 @@
 
         <ToggleButton
             android:id="@+id/tbScroll"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="false"
             android:textOff="@string/auto_scroll_x"
@@ -31,6 +34,7 @@
             android:id="@+id/tbPause"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:checked="false"
             android:textOff="@string/pause"
             android:textOn="@string/pause" />
@@ -43,7 +47,7 @@
 
         <Spinner
             android:id="@+id/spinner"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
