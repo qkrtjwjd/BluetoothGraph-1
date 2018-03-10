@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="50dp"
     android:layout_width="50dp">
-    <item android:id="@+id/menu_bluetooth"
+
+    <item
+        android:id="@+id/bluetooth"
         android:icon="@mipmap/bluetooth3"
         android:title="@string/menu_bluetooth"
-        android:showAsAction="ifRoom"/>
-
-    <item android:id="@+id/settings"
-        android:title="@string/menu_settings"
-        android:icon="@mipmap/settings2"/>
+        app:showAsAction="ifRoom" />
 
     <item android:id="@+id/Disconnect"
         android:title="@string/disconnect"/>
 
     <item android:id="@+id/Debug"
         android:title="@string/debug"/>
+
+    <item android:id="@+id/settings"
+        android:title="@string/menu_settings"
+        android:icon="@mipmap/settings2"/>
 
 
 </menu>

@@ -1,11 +1,23 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Material.Light">
-        <!-- Customize your theme here. -->
+    <style name="BluetoothGraphTheme" parent="Theme.AppCompat.CompactMenu" >
         <item name="android:colorPrimary">@color/colorPrimary</item>
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="android:titleTextColor">@color/text</item>
+        <item name="android:colorBackground">@color/text</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:colorAccent">@color/colorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorPrimary</item>
     </style>
+
+    <style name="GraphTheme" parent="Theme.AppCompat.CompactMenu" >
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorPrimary</item>
+    </style>
+
+    <style name="ButtonStyle">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:background">@null</item>
+    </style>
+
+
 </resources>

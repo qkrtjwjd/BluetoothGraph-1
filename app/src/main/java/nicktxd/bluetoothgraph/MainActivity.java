@@ -6,8 +6,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,15 +15,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.GridLabelRenderer;
-import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -105,30 +98,27 @@ public class MainActivity extends Activity {
         graph.getViewport().setScrollable(true);
         graph.getViewport().setScrollableY(true);
 
-        graph.getViewport().setMinY(-1000);
-        graph.getViewport().setMaxY(1000);
+        graph.getViewport().setMinY(-2000);
+        graph.getViewport().setMaxY(2000);
         graph.getViewport().setMaxX(50);
 
-
-
-
         Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(getResources().getColor(R.color.colorPrimary));
         paint.setStrokeWidth(5);
-        paint.setPathEffect(new DashPathEffect(new float[]{8, 5}, 0));
+        paint.setAntiAlias(true);
 
-        //graph.getGridLabelRenderer().setVerticalAxisTitle("Data");
-        //graph.getGridLabelRenderer().setHorizontalAxisTitle("Number of data point");
+        /*
+        graph.getGridLabelRenderer().setVerticalAxisTitle("Data");
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Number of data point");
         graph.getGridLabelRenderer().setVerticalAxisTitleTextSize(35);
         graph.getGridLabelRenderer().setHorizontalAxisTitleTextSize(35);
         graph.getGridLabelRenderer().setLabelVerticalWidth(80);
         graph.getGridLabelRenderer().setTextSize(30);
+        */
 
 
         if (retState == null) {
             series = new LineGraphSeries<>();
-            series.setTitle("Graph");
-            series.setBackgroundColor(Color.BLACK);
             series.setDrawDataPoints(true);
             series.setDataPointsRadius(5);
             series.setThickness(4);
@@ -148,12 +138,6 @@ public class MainActivity extends Activity {
     }
 
     void Init() {
-        Spinner typeOfDataList = (Spinner) findViewById(R.id.spinner);
-        String[] typeOfDataStrings = {"RAW", "G", "M/S²"};
-        ArrayAdapter<String> typeOfDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, typeOfDataStrings);
-        typeOfDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        typeOfDataList.setAdapter(typeOfDataAdapter);
-        typeOfDataList.setOnItemSelectedListener(itemSelectedListener);
 
         Button btReset = (Button) findViewById(R.id.bReset);
         btReset.setOnClickListener(onClickListener);
@@ -210,6 +194,7 @@ public class MainActivity extends Activity {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
             try {
                 maxCountValues = Integer.parseInt(sharedPref.getString("max_count_values", ""));
+                typeOfData = Integer.parseInt(sharedPref.getString("type_of_data", ""));
                 zero = Integer.parseInt(sharedPref.getString("zero", ""));
                 sensetivity = Integer.parseInt(sharedPref.getString("sensetivity", ""));
                 acceleration = Double.parseDouble(sharedPref.getString("acceleration", ""));
@@ -234,18 +219,6 @@ public class MainActivity extends Activity {
         }
     };
 
-    AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            typeOfData = i;
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-
-        }
-    };
-
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
         @Override
@@ -256,8 +229,8 @@ public class MainActivity extends Activity {
                 case BluetoothActivity.SUCCESS_CONNECT:
                     BluetoothActivity.connectedThread = new BluetoothActivity.ConnectedThread((BluetoothSocket) msg.obj);
                     BluetoothActivity.connectedThread.start();
-                    connected = true;
                     setTitle(BluetoothActivity.getSelDevice().getName());
+                    connected = true;
                     break;
 
                 case BluetoothActivity.MESSAGE_READ:
@@ -317,14 +290,14 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.bluetooth_menu, menu);
+        inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.menu_bluetooth:
+            case R.id.bluetooth:
                 if(connected) {
                     Toast.makeText(getApplicationContext(), "Connection already established", Toast.LENGTH_SHORT).show();
                     break;

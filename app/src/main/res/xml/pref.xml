@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+<PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="Graph">
-
+        <EditTextPreference
+            android:inputType="number"
+            android:defaultValue="500"
+            android:key="@string/max_count_values"
+            android:title="Max number of values on graph"/>
     </PreferenceCategory>
-    <EditTextPreference
-        android:defaultValue="500"
-        android:key="@string/max_count_values"
-        android:title="Max number of values on graph"/>
+
     <PreferenceCategory android:title="Data">
-
+        <ListPreference
+            android:title="Data type"
+            android:key="@string/type_of_data"
+            android:defaultValue="0"
+            android:entries="@array/listofDataTypes"
+            android:entryValues="@array/listofDataTypesValues" />
+        <EditTextPreference
+            android:inputType="number"
+            android:defaultValue="2048"
+            android:key="zero"
+            android:title="Zero" />
+        <EditTextPreference
+            android:inputType="number"
+            android:defaultValue="200"
+            android:key="sensetivity"
+            android:title="Sensetivity" />
+        <EditTextPreference
+            android:inputType="numberDecimal"
+            android:defaultValue="9.8"
+            android:key="acceleration"
+            android:title="Acceleration" />
     </PreferenceCategory>
-    <EditTextPreference
-        android:defaultValue="2048"
-        android:key="zero"
-        android:title="Zero" />
-    <EditTextPreference
-        android:defaultValue="200"
-        android:key="sensetivity"
-        android:title="Sensetivity" />
-    <EditTextPreference
-        android:defaultValue="9.8"
-        android:key="acceleration"
-        android:title="Acceleration" />
+
 </PreferenceScreen>
