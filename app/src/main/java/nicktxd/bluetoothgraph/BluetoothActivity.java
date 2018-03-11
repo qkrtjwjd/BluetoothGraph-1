@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 
 
-public class BluetoothActivity extends Activity implements AdapterView.OnItemClickListener {
+public class BluetoothActivity extends Activity  {
 
     public static void disconnect(){
         if (connectedThread != null) {
@@ -156,7 +156,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         };
         mSwipeRefreshLayout.setOnRefreshListener(swipeListener);
         listOfPairedDevices = (ListView)findViewById(R.id.listOfPairedDevices);
-        listOfPairedDevices.setOnItemClickListener(this);
+        listOfPairedDevices.setOnItemClickListener(onItemClickListener);
         if (retState == null) {
             listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, 0);
             devices = new ArrayList<>();
@@ -227,21 +227,24 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        if (btAdapter.isDiscovering()){
-            btAdapter.cancelDiscovery();
+    AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (btAdapter.isDiscovering()){
+                btAdapter.cancelDiscovery();
+            }
+            if (listAdapter.getItem(position).contains("(Paired)")){
+                Toast.makeText(getApplicationContext(), "Connecting to "+listAdapter.getItem(position), Toast.LENGTH_SHORT).show();
+                BluetoothDevice selectedDevice = devices.get(position);
+                ConnectThread connect = new ConnectThread(selectedDevice);
+                connect.start();
+                selDevice = selectedDevice;
+            }else {
+                Toast.makeText(getApplicationContext(), "device is not paired", Toast.LENGTH_SHORT).show();
+            }
         }
-        if (listAdapter.getItem(arg2).contains("(Paired)")){
-            Toast.makeText(getApplicationContext(), "Connecting to "+listAdapter.getItem(arg2), Toast.LENGTH_SHORT).show();
-            BluetoothDevice selectedDevice = devices.get(arg2);
-            ConnectThread connect = new ConnectThread(selectedDevice);
-            connect.start();
-            selDevice = selectedDevice;
-        }else {
-            Toast.makeText(getApplicationContext(), "device is not paired", Toast.LENGTH_SHORT).show();
-        }
-    }
+    };
+
 
     public static BluetoothDevice getSelDevice(){
         return selDevice;
