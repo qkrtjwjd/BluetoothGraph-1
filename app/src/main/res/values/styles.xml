@@ -7,6 +7,16 @@
         <item name="android:textColor">@color/textColorPrimary</item>
         <item name="android:colorAccent">@color/colorPrimary</item>
         <item name="android:textColorSecondary">@color/textColorPrimary</item>
+        <item name="android:alertDialogTheme">@style/PrefTheme</item>
+    </style>
+
+    <style name="PrefTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:textColorSecondary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:background">@color/text</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorAlertDialogListItem">@color/textColorPrimary</item>
     </style>
 
     <style name="GraphTheme" parent="Theme.AppCompat.CompactMenu" >
@@ -18,6 +28,5 @@
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:background">@null</item>
     </style>
-
 
 </resources>

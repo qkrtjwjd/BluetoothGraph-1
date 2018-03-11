@@ -1,6 +1,7 @@
 package nicktxd.bluetoothgraph;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
@@ -83,7 +84,7 @@ public class MainActivity extends Activity {
         retState = (objToSave) getLastNonConfigurationInstance();
         graphInit();
         Init();
-
+        getSettings();
     }
 
     void graphInit() {
@@ -139,6 +140,7 @@ public class MainActivity extends Activity {
 
     void Init() {
 
+
         Button btReset = (Button) findViewById(R.id.bReset);
         btReset.setOnClickListener(onClickListener);
         tbtScroll = (ToggleButton) findViewById(R.id.tbScroll);
@@ -192,15 +194,19 @@ public class MainActivity extends Activity {
     OnSharedPreferenceChangeListener settingsChangedListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-            try {
-                maxCountValues = Integer.parseInt(sharedPref.getString("max_count_values", ""));
-                typeOfData = Integer.parseInt(sharedPref.getString("type_of_data", ""));
-                zero = Integer.parseInt(sharedPref.getString("zero", ""));
-                sensetivity = Integer.parseInt(sharedPref.getString("sensetivity", ""));
-                acceleration = Double.parseDouble(sharedPref.getString("acceleration", ""));
-            }catch (Exception ignored){}
+        getSettings();
         }
     };
+
+    void getSettings(){
+        try {
+            maxCountValues = Integer.parseInt(sharedPref.getString("max_count_values", ""));
+            typeOfData = Integer.parseInt(sharedPref.getString("type_of_data", ""));
+            zero = Integer.parseInt(sharedPref.getString("zero", ""));
+            sensetivity = Integer.parseInt(sharedPref.getString("sensetivity", ""));
+            acceleration = Double.parseDouble(sharedPref.getString("acceleration", ""));
+        }catch (Exception ignored){}
+    }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override

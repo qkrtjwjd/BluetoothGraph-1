@@ -11,8 +11,7 @@
         android:icon="@mipmap/launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/BluetoothGraphTheme"
-        >
+        android:theme="@style/BluetoothGraphTheme">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden"

@@ -1,6 +1,7 @@
 package nicktxd.bluetoothgraph;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,6 +13,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -62,8 +64,6 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
     BroadcastReceiver receiver;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-
-
     private class objToSave{
         private ArrayAdapter<String> listAdapter;
         private ArrayList<BluetoothDevice> devices;
@@ -106,6 +106,17 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void startDiscovery() {
         btAdapter.cancelDiscovery();
         btAdapter.startDiscovery();
@@ -126,6 +137,12 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
     }
 
     private void init(){
+
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         final SwipeRefreshLayout.OnRefreshListener swipeListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override

@@ -1,54 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/bg"
-    tools:context="nicktxd.bluetoothgraph.MainActivity"
     android:orientation="horizontal"
-    android:weightSum="100">
+    tools:context="nicktxd.bluetoothgraph.MainActivity">
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="100" />
+        android:layout_width="500dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:theme="@style/GraphTheme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/LL2"
+    <ToggleButton
+        android:id="@+id/tbScroll"
+        style="@style/ButtonStyle"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:checked="false"
+        android:textOff="@string/auto_scroll_x_on"
+        android:textOn="@string/auto_scroll_x_off"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/graph"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <ToggleButton
+        android:id="@+id/tbPause"
+        style="@style/ButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:checked="false"
+        android:textOff="@string/pause"
+        android:textOn="@string/unpause"
+        app:layout_constraintBottom_toTopOf="@+id/bReset"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/graph"
+        app:layout_constraintTop_toBottomOf="@+id/tbScroll" />
 
-        <ToggleButton
-            android:id="@+id/tbScroll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:textOff="@string/auto_scroll_x_on"
-            android:textOn="@string/auto_scroll_x_off" />
+    <Button
+        android:id="@+id/bReset"
+        style="@style/ButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/reset_graph"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/graph" />
 
-        <ToggleButton
-            android:id="@+id/tbPause"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:textOff="@string/pause"
-            android:textOn="@string/unpause" />
-
-        <Button
-            android:id="@+id/bReset"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/reset_graph" />
-
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

@@ -6,6 +6,7 @@
         <EditTextPreference
             android:inputType="number"
             android:defaultValue="500"
+            android:textColor="@color/textColorPrimary"
             android:key="@string/max_count_values"
             android:title="Max number of values on graph"/>
     </PreferenceCategory>
@@ -14,21 +15,25 @@
         <ListPreference
             android:title="Data type"
             android:key="@string/type_of_data"
+            android:textColor="@color/textColorPrimary"
             android:defaultValue="0"
             android:entries="@array/listofDataTypes"
             android:entryValues="@array/listofDataTypesValues" />
         <EditTextPreference
             android:inputType="number"
+            android:textColor="@color/textColorPrimary"
             android:defaultValue="2048"
             android:key="zero"
             android:title="Zero" />
         <EditTextPreference
             android:inputType="number"
+            android:textColor="@color/textColorPrimary"
             android:defaultValue="200"
             android:key="sensetivity"
             android:title="Sensetivity" />
         <EditTextPreference
             android:inputType="numberDecimal"
+            android:textColor="@color/textColorPrimary"
             android:defaultValue="9.8"
             android:key="acceleration"
             android:title="Acceleration" />
