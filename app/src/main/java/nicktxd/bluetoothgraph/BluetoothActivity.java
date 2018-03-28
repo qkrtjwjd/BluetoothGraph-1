@@ -29,21 +29,7 @@ import java.util.UUID;
 
 public class BluetoothActivity extends Activity  {
 
-    public static void disconnect(){
-        if (connectedThread != null) {
-            connectedThread.cancel();
-            connectedThread = null;
-        }
-    }
-    public static void stopDebug(){
-        if(debugThread != null)
-            cancelDebug = true;
-            debugThread = null;
-    }
     private static boolean cancelDebug;
-    public static void gethandler(Handler handler){//Bluetooth handler
-        mHandler = handler;
-    }
     static Handler mHandler = new Handler();
 
     static ConnectedThread connectedThread;
@@ -51,6 +37,7 @@ public class BluetoothActivity extends Activity  {
     public static final  UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     protected static final int SUCCESS_CONNECT = 0;
     protected static final int MESSAGE_READ = 1;
+    protected static final int DISCONNECTED = 2;
 
     private static BluetoothDevice selDevice;
 
@@ -72,6 +59,23 @@ public class BluetoothActivity extends Activity  {
     private objToSave saveState;
     private objToSave retState;
 
+    public static void disconnect(){
+        if (connectedThread != null) {
+            connectedThread.cancel();
+            connectedThread = null;
+        }
+    }
+    public static void stopDebug(){
+        if(debugThread != null)
+            cancelDebug = true;
+        debugThread = null;
+    }
+
+    public static void gethandler(Handler handler){
+        //Bluetooth handler
+        mHandler = handler;
+    }
+
     @Override
     public Object onRetainNonConfigurationInstance() {
         //Сохранить данные
@@ -90,6 +94,7 @@ public class BluetoothActivity extends Activity  {
         retState = (objToSave) getLastNonConfigurationInstance();
 
         init();
+
         if (btAdapter == null) {
             Toast.makeText(getApplicationContext(), "No bluetooth detected", Toast.LENGTH_SHORT).show();
             finish();
@@ -100,7 +105,6 @@ public class BluetoothActivity extends Activity  {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             // int permissionCheck = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
 
-            getPairedDevices();
             startDiscovery();
 
         }
@@ -131,7 +135,7 @@ public class BluetoothActivity extends Activity  {
         devicesArray = btAdapter.getBondedDevices();
         if (devicesArray.size()>0){
             for(BluetoothDevice device:devicesArray){
-                pairedDevices.add(device.getName());
+                pairedDevices.add(device.getAddress());
             }
         }
     }
@@ -147,16 +151,20 @@ public class BluetoothActivity extends Activity  {
         final SwipeRefreshLayout.OnRefreshListener swipeListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (btAdapter != null)
-                    btAdapter.cancelDiscovery();
+                if (btAdapter == null)
+                    return;
                 listAdapter.clear();
+                devices.clear();
                 startDiscovery();
                 mSwipeRefreshLayout.setRefreshing(false);
+
             }
         };
         mSwipeRefreshLayout.setOnRefreshListener(swipeListener);
+
         listOfPairedDevices = (ListView)findViewById(R.id.listOfPairedDevices);
         listOfPairedDevices.setOnItemClickListener(onItemClickListener);
+
         if (retState == null) {
             listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, 0);
             devices = new ArrayList<>();
@@ -165,40 +173,41 @@ public class BluetoothActivity extends Activity  {
             listAdapter = retState.listAdapter;
             devices = retState.devices;
         }
+
         listOfPairedDevices.setAdapter(listAdapter);
+
         btAdapter = BluetoothAdapter.getDefaultAdapter();
+
         pairedDevices = new ArrayList<>();
+
         receiver = new BroadcastReceiver(){
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if (BluetoothDevice.ACTION_FOUND.equals(action)){
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    boolean unique = true;
-                    for(int i=0; i<devices.size(); i++)
-                        if(devices.get(i).equals(device))
-                            unique = false;
-                    if (unique) {
+                    if (isUnique(device)) {
                         devices.add(device);
-                        String s = "";
-                        for (int a = 0; a < pairedDevices.size(); a++) {
-                            if (device.getName().equals(pairedDevices.get(a))) {
-                                s = "(Paired)";
-                                break;
-                            }
-                        }
-                        listAdapter.add(device.getName() + " " + s + " " + "\n" + device.getAddress());
+                        String stringPaired;
+                        if(isPaired(device))
+                            stringPaired = "(Paired)";
+                        else
+                            stringPaired = "(Not paired)";
+                        String deviceName = device.getName();
+                        if (deviceName == null)
+                            deviceName = "No name";
+                        listAdapter.add(deviceName + "\n" + stringPaired + "\n" + device.getAddress());
                     }
                 }else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)){
                     if (btAdapter.getState() == BluetoothAdapter.STATE_OFF){
                         turnOnBT();
                     }
-                }else if(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(action)){
+                }/*else if(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(action)){
                     if (intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1) == BluetoothAdapter.STATE_DISCONNECTED){
                         Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
                         connectedThread.cancel();
                     }
-                }
+                }*/
             }
 
         };
@@ -208,6 +217,15 @@ public class BluetoothActivity extends Activity  {
         registerReceiver(receiver, filter);
         filter = new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
         registerReceiver(receiver, filter);
+    }
+    boolean isUnique(BluetoothDevice device){
+        for(int i=0; i<devices.size(); i++)
+            if(devices.get(i).equals(device))
+                return false;
+        return true;
+    }
+    boolean isPaired(BluetoothDevice device){
+        return device.getBondState() == 12;
     }
 
     @Override
@@ -240,7 +258,7 @@ public class BluetoothActivity extends Activity  {
                 connect.start();
                 selDevice = selectedDevice;
             }else {
-                Toast.makeText(getApplicationContext(), "device is not paired", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Device is not paired", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -313,6 +331,7 @@ public class BluetoothActivity extends Activity  {
             while (true) {
                 try {
                     bytes = mmInStream.read(buffer);
+
                     String readed = new String(buffer, 0, bytes);
                     readMessage.append(readed);
 
@@ -340,6 +359,7 @@ public class BluetoothActivity extends Activity  {
 
         void cancel() {
             try {
+                mHandler.obtainMessage(DISCONNECTED, mmSocket).sendToTarget();
                 mmSocket.close();
             } catch (IOException ignored) { }
         }
@@ -347,6 +367,7 @@ public class BluetoothActivity extends Activity  {
 
     static class DEBUGThread extends Thread {
         public void run() {
+            int temp;
             cancelDebug = false;
             while (true) {
                 try {
@@ -357,7 +378,7 @@ public class BluetoothActivity extends Activity  {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                     int temp = (int)((Math.random()*4296-2048));
+                    temp = (int)((Math.random()*11 - 10)+2147);
                     mHandler.obtainMessage(MESSAGE_READ, "s"+temp+"\n").sendToTarget();
 
                 } catch (Exception e) {

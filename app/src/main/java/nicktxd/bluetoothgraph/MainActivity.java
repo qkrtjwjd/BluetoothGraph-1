@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
     private int curType = 0;
     private int typeOfData = 0;
 
+
     private SharedPreferences sharedPref;
 
     private double graphLastXValue = 0;
@@ -133,7 +134,7 @@ public class MainActivity extends Activity {
         series.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
-                Toast.makeText(getApplicationContext(), "On Data Point clicked: " + dataPoint, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "On Data Point clicked: " + dataPoint.getY(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -240,6 +241,7 @@ public class MainActivity extends Activity {
                     break;
 
                 case BluetoothActivity.MESSAGE_READ:
+
                     String strIncom = (String) msg.obj;
                     if (strIncom == null)
                         break;
@@ -281,6 +283,10 @@ public class MainActivity extends Activity {
                         }
                     }
                     break;
+                case BluetoothActivity.DISCONNECTED:
+                     connected = false;
+                     setTitle(getString(R.string.app_name));
+                     break;
             }
         }
         boolean isFloatNumber(String num){
