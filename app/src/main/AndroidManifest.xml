@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".prefActivity"
+            android:name=".PrefActivity"
             android:label="@string/Settings_label"
             android:theme="@style/BluetoothGraphTheme">
             <intent-filter>

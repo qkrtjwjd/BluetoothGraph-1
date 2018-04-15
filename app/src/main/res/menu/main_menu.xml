@@ -6,7 +6,6 @@
 
     <item
         android:id="@+id/bluetooth"
-        android:icon="@mipmap/bluetooth3"
         android:title="@string/menu_bluetooth"
         app:showAsAction="ifRoom" />
 
@@ -17,8 +16,7 @@
         android:title="@string/debug"/>
 
     <item android:id="@+id/settings"
-        android:title="@string/menu_settings"
-        android:icon="@mipmap/settings2"/>
+        android:title="@string/menu_settings"/>
 
 
 </menu>

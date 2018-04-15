@@ -1,7 +1,6 @@
 package nicktxd.bluetoothgraph;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
@@ -19,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
@@ -36,20 +36,12 @@ public class MainActivity extends Activity {
     private int curType = 0;
     private int typeOfData = 0;
 
-
     private SharedPreferences sharedPref;
 
     private double graphLastXValue = 0;
     private int maxCountValues;
-    private LineGraphSeries<DataPoint> series;
-    private ToggleButton tbtScroll;
-    private ToggleButton tbtPause;
-    private boolean connected = false;
-    private boolean debug = false;
-    private boolean autoScroll = true;
-    private boolean pause = false;
 
-    private class objToSave{
+    private class objToSave {
         private LineGraphSeries<DataPoint> series;
         private double graphLastXValue;
         private boolean autoScroll;
@@ -58,12 +50,130 @@ public class MainActivity extends Activity {
         private boolean debug;
         private int typeOfData;
     }
+
+    OnSharedPreferenceChangeListener settingsChangedListener =
+        new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(
+            SharedPreferences sharedPreferences, String s) {
+            getSettings();
+        }
+    };
+    private LineGraphSeries<DataPoint> series;
+    private ToggleButton tbtScroll;
+    private ToggleButton tbtPause;
+    private boolean connected = false;
+    private boolean debug = false;
+    private boolean autoScroll = true;
+    private boolean pause = false;
+    View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.tbScroll:
+                    autoScroll = tbtScroll.isChecked();
+                    break;
+                case R.id.tbPause:
+                    pause = tbtPause.isChecked();
+                    break;
+                case R.id.bReset:
+                    resetGraph();
+                    break;
+            }
+        }
+    };
+    @SuppressLint("HandlerLeak")
+    Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+
+                case BluetoothActivity.SUCCESS_CONNECT:
+                    BluetoothActivity.connectedThread =
+                        new BluetoothActivity.ConnectedThread(
+                            (BluetoothSocket) msg.obj);
+                    BluetoothActivity.connectedThread.start();
+                    setTitle(BluetoothActivity.getSelectedDevice().getName());
+                    connected = true;
+                    break;
+
+                case BluetoothActivity.MESSAGE_READ:
+                    String strIncom = (String) msg.obj;
+                    if (strIncom == null)
+                        break;
+                    if (strIncom.indexOf('s') == 0) {
+                        boolean flag = true;
+                        try {
+                            strIncom = strIncom.replace(
+                                "s", "");
+                            strIncom = strIncom.substring(0,
+                                strIncom.indexOf('\n'));
+                        } catch (Exception e) {
+                            flag = false;
+                        }
+                        if (isFloatNumber(strIncom) && flag && !pause) {
+                            double rawData = Double.parseDouble(strIncom);
+                            double procData = 0;
+                            switch (typeOfData) {
+                                case 0:
+                                    procData = rawData;
+                                    curType = 0;
+                                    break;
+                                case 1:
+                                    procData = rawToG(rawData);
+                                    curType = 1;
+                                    break;
+                                case 2:
+                                    procData = rawToAc(rawData);
+                                    curType = 2;
+                                    break;
+                            }
+                            if (curType != lastType) {
+                                resetGraph();
+                                lastType = curType;
+                            }
+
+                            try {
+                                series.appendData(new DataPoint(
+                                    graphLastXValue, procData), autoScroll,
+                                    maxCountValues);
+                            } catch (Exception ignored) {
+                                System.out.println(ignored);
+                            }
+
+                            graphLastXValue += 1;
+                        }
+                    }
+                    break;
+
+                case BluetoothActivity.DISCONNECTED:
+                    connected = false;
+                    setTitle(getString(R.string.app_name));
+                    break;
+
+                case BluetoothActivity.CONNECTION_LOST:
+                    Toast.makeText(getApplicationContext(),
+                            "Connection lost", Toast.LENGTH_LONG).show();
+                    BluetoothActivity.disconnect();
+                    break;
+            }
+        }
+
+        boolean isFloatNumber(String num) {
+            try {
+                Double.parseDouble(num);
+            } catch (NumberFormatException nfe) {
+                return false;
+            }
+            return true;
+        }
+    };
     private objToSave saveState;
     private objToSave retState;
 
     @Override
     public Object onRetainNonConfigurationInstance() {
-        //Сохранить данные
         saveState.series = series;
         saveState.graphLastXValue = graphLastXValue;
         saveState.autoScroll = autoScroll;
@@ -92,8 +202,8 @@ public class MainActivity extends Activity {
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
 
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setYAxisBoundsManual(true);
+        //graph.getViewport().setXAxisBoundsManual(true);
+        //graph.getViewport().setYAxisBoundsManual(true);
 
         graph.getViewport().setScalable(true);
         graph.getViewport().setScalableY(true);
@@ -111,7 +221,8 @@ public class MainActivity extends Activity {
 
         /*
         graph.getGridLabelRenderer().setVerticalAxisTitle("Data");
-        graph.getGridLabelRenderer().setHorizontalAxisTitle("Number of data point");
+        graph.getGridLabelRenderer().setHorizontalAxisTitle(
+            "Number of data point");
         graph.getGridLabelRenderer().setVerticalAxisTitleTextSize(35);
         graph.getGridLabelRenderer().setHorizontalAxisTitleTextSize(35);
         graph.getGridLabelRenderer().setLabelVerticalWidth(80);
@@ -125,7 +236,7 @@ public class MainActivity extends Activity {
             series.setDataPointsRadius(5);
             series.setThickness(4);
             series.setCustomPaint(paint);
-        }else {
+        } else {
             series = retState.series;
             graphLastXValue = retState.graphLastXValue;
         }
@@ -134,7 +245,9 @@ public class MainActivity extends Activity {
         series.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
-                Toast.makeText(getApplicationContext(), "On Data Point clicked: " + dataPoint.getY(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),
+                    "On Data Point clicked: " + dataPoint.getY(),
+                    Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -152,16 +265,13 @@ public class MainActivity extends Activity {
         tbtPause.setOnClickListener(onClickListener);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        try {
-            maxCountValues = Integer.parseInt(sharedPref.getString("max_count_values", ""));
-            zero = Integer.parseInt(sharedPref.getString("zero", ""));
-            sensetivity = Integer.parseInt(sharedPref.getString("sensetivity", ""));
-            acceleration = Double.parseDouble(sharedPref.getString("acceleration", ""));
-        }catch (Exception ignored){}
 
-        sharedPref.registerOnSharedPreferenceChangeListener(settingsChangedListener);
+        getSettings();
 
-        if(retState != null){
+        sharedPref.registerOnSharedPreferenceChangeListener(
+            settingsChangedListener);
+
+        if (retState != null) {
             typeOfData = retState.typeOfData;
             autoScroll = retState.autoScroll;
             tbtScroll.setChecked(autoScroll);
@@ -169,135 +279,44 @@ public class MainActivity extends Activity {
             tbtPause.setChecked(pause);
             connected = retState.connected;
             debug = retState.debug;
-            if(connected) {
-                setTitle(BluetoothActivity.getSelDevice().getName());
+            if (connected) {
+                setTitle(BluetoothActivity.getSelectedDevice().getName());
             }
-            if (debug){
+            if (debug) {
                 setTitle("Debug");
             }
         }
     }
 
-    void resetGraph(){
-        series.resetData(new DataPoint[]{new DataPoint(0,0)});
+    void resetGraph() {
+        series.resetData(new DataPoint[]{new DataPoint(0, 0)});
         graphLastXValue = 0;
         series.appendData(new DataPoint(0, 0), autoScroll, maxCountValues);
     }
 
-    double rawToG(double rawData){
-        return (rawData - zero)/sensetivity;
+    double rawToG(double rawData) {
+        return (rawData - zero) / sensetivity;
     }
 
-    double rawToAc(double rawData){
-        return (rawData - zero)*acceleration/sensetivity;
+    double rawToAc(double rawData) {
+        return (rawData - zero) * acceleration / sensetivity;
     }
 
-    OnSharedPreferenceChangeListener settingsChangedListener = new OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        getSettings();
-        }
-    };
-
-    void getSettings(){
+    void getSettings() {
         try {
-            maxCountValues = Integer.parseInt(sharedPref.getString("max_count_values", ""));
-            typeOfData = Integer.parseInt(sharedPref.getString("type_of_data", ""));
-            zero = Integer.parseInt(sharedPref.getString("zero", ""));
-            sensetivity = Integer.parseInt(sharedPref.getString("sensetivity", ""));
-            acceleration = Double.parseDouble(sharedPref.getString("acceleration", ""));
-        }catch (Exception ignored){}
+            maxCountValues = Integer.parseInt(sharedPref.getString(
+                "max_count_values", "500"));
+            typeOfData = Integer.parseInt(sharedPref.getString(
+                "type_of_data", "0"));
+            zero = Integer.parseInt(sharedPref.getString("zero", "2048"));
+            sensetivity = Integer.parseInt(sharedPref.getString(
+                "sensetivity", "200"));
+            acceleration = Double.parseDouble(sharedPref.getString(
+                "acceleration", "9.8"));
+        } catch (Exception ignored) {
+            System.out.println(ignored);
+        }
     }
-
-    View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()){
-                case R.id.tbScroll:
-                    autoScroll = tbtScroll.isChecked();
-                    break;
-                case R.id.tbPause:
-                    pause = tbtPause.isChecked();
-                    break;
-                case R.id.bReset:
-                    resetGraph();
-                    break;
-            }
-        }
-    };
-
-    @SuppressLint("HandlerLeak")
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-
-                case BluetoothActivity.SUCCESS_CONNECT:
-                    BluetoothActivity.connectedThread = new BluetoothActivity.ConnectedThread((BluetoothSocket) msg.obj);
-                    BluetoothActivity.connectedThread.start();
-                    setTitle(BluetoothActivity.getSelDevice().getName());
-                    connected = true;
-                    break;
-
-                case BluetoothActivity.MESSAGE_READ:
-
-                    String strIncom = (String) msg.obj;
-                    if (strIncom == null)
-                        break;
-                    if (strIncom.indexOf('s') == 0) {
-                        boolean flag = true;
-                        try {
-                            strIncom = strIncom.replace("s", "");
-                            strIncom = strIncom.substring(0, strIncom.indexOf('\n'));
-                        } catch (Exception e) {
-                            flag = false;
-                        }
-                        if (isFloatNumber(strIncom) && flag && !pause) {
-                            double rawData = Double.parseDouble(strIncom);
-                            double procData = 0;
-                            switch (typeOfData){
-                                case 0:
-                                    procData = rawData;
-                                    curType = 0;
-                                    break;
-                                case 1:
-                                    procData = rawToG(rawData);
-                                    curType = 1;
-                                    break;
-                                case 2:
-                                    procData = rawToAc(rawData);
-                                    curType = 2;
-                                    break;
-                            }
-                            if (curType != lastType){
-                                resetGraph();
-                                lastType = curType;
-                            }
-
-                            try {
-                                series.appendData(new DataPoint(graphLastXValue, procData), autoScroll, maxCountValues);
-                            }catch (Exception ignored){}
-
-                            graphLastXValue+=1;
-                        }
-                    }
-                    break;
-                case BluetoothActivity.DISCONNECTED:
-                     connected = false;
-                     setTitle(getString(R.string.app_name));
-                     break;
-            }
-        }
-        boolean isFloatNumber(String num){
-            try{
-                Double.parseDouble(num);
-            } catch(NumberFormatException nfe) {
-                return false;
-            }
-            return true;
-        }
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -308,14 +327,17 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.bluetooth:
-                if(connected) {
-                    Toast.makeText(getApplicationContext(), "Connection already established", Toast.LENGTH_SHORT).show();
+                if (connected) {
+                    Toast.makeText(getApplicationContext(),
+                        "Connection already established",
+                        Toast.LENGTH_SHORT).show();
                     break;
                 }
-                if(debug){
-                    Toast.makeText(getApplicationContext(), "Debug already started", Toast.LENGTH_SHORT).show();
+                if (debug) {
+                    Toast.makeText(getApplicationContext(),
+                        "Debug already started", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 startActivity(new Intent("android.intent.action.BT"));
@@ -324,12 +346,12 @@ public class MainActivity extends Activity {
                 startActivity(new Intent("android.intent.action.SET"));
                 break;
             case R.id.Disconnect:
-                if(connected){
+                if (connected) {
                     BluetoothActivity.disconnect();
                     connected = false;
                     setTitle(getString(R.string.app_name));
                 }
-                if(debug){
+                if (debug) {
                     BluetoothActivity.stopDebug();
                     debug = false;
                     setTitle(getString(R.string.app_name));
@@ -337,15 +359,20 @@ public class MainActivity extends Activity {
                 }
                 break;
             case R.id.Debug:
-                if(connected) {
-                    Toast.makeText(getApplicationContext(), "Connection already established", Toast.LENGTH_SHORT).show();
+                if (connected) {
+                    Toast.makeText(getApplicationContext(),
+                        "Connection already established",
+                        Toast.LENGTH_SHORT).show();
                     break;
                 }
-                if(debug){
-                    Toast.makeText(getApplicationContext(), "Debug already started", Toast.LENGTH_SHORT).show();
+                if (debug) {
+                    Toast.makeText(getApplicationContext(),
+                        "Debug already started",
+                        Toast.LENGTH_SHORT).show();
                     break;
                 }
-                BluetoothActivity.debugThread = new BluetoothActivity.DEBUGThread();
+                BluetoothActivity.debugThread =
+                    new BluetoothActivity.DebugThread();
                 BluetoothActivity.debugThread.start();
                 setTitle(getString(R.string.debug));
                 debug = true;
@@ -353,4 +380,5 @@ public class MainActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

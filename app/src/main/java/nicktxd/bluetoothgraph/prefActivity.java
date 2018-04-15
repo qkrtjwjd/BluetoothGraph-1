@@ -6,9 +6,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.view.MenuItem;
 
-import nicktxd.bluetoothgraph.R;
-
-public class prefActivity extends PreferenceActivity {
+public class PrefActivity extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,11 +35,9 @@ public class prefActivity extends PreferenceActivity {
                 .commit();
     }
 
-    public static class SettingsFr extends PreferenceFragment
-    {
+    public static class SettingsFr extends PreferenceFragment {
         @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
+        public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref);
 
